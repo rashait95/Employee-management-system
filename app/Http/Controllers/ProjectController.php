@@ -19,7 +19,10 @@ class ProjectController extends Controller
     {
         
         $projects = Project::with('employees')->get();
-        return $this->customeResponse($projects,"Done",200);
+        return response()->json([
+            'status'=>'success',
+            'projects'=>$projects,
+        ]);
     }
 
     /**
@@ -46,11 +49,22 @@ class ProjectController extends Controller
 
             DB::commit();
 
-            return $this->customeResponse($project,"Done",200);
+            
+           return response()->json(
+            ['status'=>'project created successfuly',
+            'project'=> $project
+            ,]
+            );
         }  catch   (\Exception $e) {
             Log::error($th);
             DB::rollBack();
-            return $this->customeResponse(null, 'Failed To Create', 500);
+            return response()->json([
+                'status'=>'project not created',
+                'error'=>$th->getMessage(),
+                
+            ], 500);
+
+           
         }
     }
 
@@ -72,11 +86,11 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ProjectRequest $request, $id)
     {
         try {
             DB::beginTransaction();
-            $project->project_name= $request->input('naproject_name') ?? $project->project_name;
+            $project->project_name= $request->input('project_name') ?? $project->project_name;
             if ($request->has('employees_id')) {
                 $project->employees()->sync($request->employees_id);
             }
@@ -84,7 +98,10 @@ class ProjectController extends Controller
             DB::commit();
             $project->save();
         
-            return $this->customeResponse($data, 'Successfully Updated', 200);
+            return response()->json([
+                'status'=>'project updated succesfully',
+                'project'=>$project
+            ]);
         } catch (\Throwable $th) {
             Log::error($th);
             DB::rollBack();
@@ -101,6 +118,9 @@ class ProjectController extends Controller
     public function destroy($id)
     {
         $project->delete();
-        return $this->customeResponse('', 'Deleted', 200);
+        return response()->json([
+            'status'=>'project deleted succesfully',
+            'project'=>$project
+           ]);
     }
 }

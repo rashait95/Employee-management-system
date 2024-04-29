@@ -171,18 +171,18 @@ class DepartmentController extends Controller
         ]);
      }
     
-     public function restore(Department $department)
-     {
-         $department->restore();
+     public function restore(string $id)
+     {   
+         $department=Department::withTrashed()->where('id', $id)->restore();
  
-         return response()->json(['department' => $department], 400);
+        // return response()->json(['department' => $department], 400);
+         return response()->json(['message' => 'Department restored']);
      }
  
-     public function forceDelete(Department $department)
+     public function forceDelete(string $id)
      {
-         $$department->forceDelete();
- 
-         return response()->json(null, 400);
+         $department=Department::withTrashed()->where('id', $id)->forceDelete();
+         return response()->json(['message' => 'Department deleted']);
      }
 
      public function showSoftDeletedDepartments()

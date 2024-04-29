@@ -1,12 +1,12 @@
 <?php
 
-use function;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NoteController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\ProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,19 +24,27 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-Route::post('/register',[AuthController::class,'register'])->name('register')->middleware(Authenticate::class);
-Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware(Authenticate::class);
+Route::post('/register',[AuthController::class,'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware(Authenticate::class);
 //Route::post('/logout',[AuthController::class],'logout');
 
 Route::middleware('api')->group(function () {
 Route::apiResource('departments',DepartmentController::class);
 Route::apiResource('employees',EmployeeController::class);
-Route::apiResource('/projects', ProjectController::class);
+Route::apiResource('projects', ProjectController::class);
 
 
+Route::get('department-deleted', [DepartmentController::class, 'showSoftDeletedDepartments'])->name('department-deleted');
+Route::put('department-restore/{department}', [DepartmentController::class, 'restore'])->name('department-restore');
+Route::delete('department-force-delete/{department}', [DepartmentController::class, 'forceDelete'])->name('department-force-delete');
 
-Route::get('/department-deleted', [DepartmentController::class, 'showSoftDeletedDepartments']);
-Route::put('/department-restore/{department}', [DepartmentController::class, 'restore']);
-Route::delete('/department-force-delete/{department}', [DepartmentController::class, 'forceDelete']);
+Route::get('employee-deleted', [EmployeeController::class, 'showSoftDeletedEmployees'])->name('employee-deleted');
+Route::put('employee-restore/{employee}', [EmployeeController::class, 'restore'])->name('employee-restore');
+Route::delete('employee-force-delete/{employee}', [EmployeeController::class, 'forceDelete'])->name('employee-force-delete');
+
+
+Route::get('notes', [NoteController::class, 'index']);
+
+Route::post('employee-note/{employee}', [NoteController::class, 'storeEmployeeNote'])->name('employee-note');
 });

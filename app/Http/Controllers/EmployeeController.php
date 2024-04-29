@@ -120,19 +120,26 @@ class EmployeeController extends Controller
     }
 
 
+    public function restore(string $id)
+    {   
+        $employee=Employee::withTrashed()->where('id', $id)->restore();
 
-    public function restore(Employee $employee)
-    {
-        $employee->restore();
-
-        return response()->json(['employee' => $employee], 400);
+       // return response()->json(['department' => $department], 400);
+        return response()->json(['message' => 'Employee restored']);
     }
 
-    public function forceDelete(Employee $employee)
+    public function forceDelete(string $id)
     {
-        $employee->forceDelete();
+        $employee=Employee::withTrashed()->where('id', $id)->forceDelete();
 
-        return response()->json(null, 400);
-    }
+         return response()->json(['message' => 'Employee deleted']);
+        }
+
+    public function showSoftDeletedEmployees()
+{
+   $SoftDeletedEmployees= Employee::onlyTrashed()->get();
+   
+   return response()->json(['soft_deleted_employee' => $SoftDeletedEmployees]);
+}
 
 }
